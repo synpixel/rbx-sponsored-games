@@ -9,6 +9,7 @@ use terminal_hyperlink::Hyperlink;
 #[serde(rename_all = "camelCase")]
 struct GameSort {
     token: String,
+    context_country_region_id: usize,
     name: String,
 }
 
@@ -48,8 +49,8 @@ struct Cli {
     limit: Option<usize>,
 
     /// The country region id you want to use
-    #[arg(short, long, default_value_t = 77)]
-    region_id: usize,
+    #[arg(short, long)]
+    region_id: Option<usize>,
 }
 
 async fn get_games_list(
@@ -121,7 +122,8 @@ async fn main() -> Result<(), reqwest::Error> {
             &roblosecurity,
             &sponsored_sort.token,
             &game_sorts.page_context.page_id,
-            args.region_id,
+            args.region_id
+                .unwrap_or(sponsored_sort.context_country_region_id),
         )
         .await
         .expect("Error fetching games");
